@@ -1,37 +1,35 @@
 #pragma once
 
-#include <Arduino.h>
-#include "config.h"
+#ifndef LFR_CORE_H
+#define LFR_CORE_H
+
+#include <stdint.h>
+#include <stdbool.h>
 #include "types.h"
 
-namespace LFRCore {
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-    // Hardware and Core 1 peripheral initialization
-    void initHardware();
+// Core 1 LFR state machine and lifecycle
+void lfr_init(void);
+void lfr_start(void);
+void lfr_stop(void);
+void lfr_step(void);
 
-    // FreeRTOS task entry point pinned to Core 1
-    void taskEntry(void* parameter);
+// FreeRTOS task entry point pinned to Core 1
+void lfr_task_entry(void *parameter);
 
-    // Motor driver direct primitives (Core 1 only!)
-    void motor1run(int motorSpeed); // Left motor
-    void motor2run(int motorSpeed); // Right motor
-    void stopMotors();
+// Physical button handling (GPIO 4 & 5)
+void lfr_handle_buttons(void);
 
-    // Low-level sensor scanning
-    int  sensorRead(int channel);
-    void readAllRaw(int rawOut[NUM_SENSORS]);
-    void readLine();
+// Microsecond timing diagnostics
+uint32_t lfr_get_last_exec_us(void);
+uint32_t lfr_get_min_exec_us(void);
+uint32_t lfr_get_max_exec_us(void);
 
-    // Calibration and Line-following algorithms
-    void calibrate();
-    void linefollow();
-    void runStep();
+#ifdef __cplusplus
+}
+#endif
 
-    // State transitions
-    void startRun();
-    void stopRun();
-
-    // Button handling
-    void handleButtons();
-
-} // namespace LFRCore
+#endif // LFR_CORE_H

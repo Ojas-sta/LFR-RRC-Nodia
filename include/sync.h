@@ -1,54 +1,79 @@
 #pragma once
 
-#include <Arduino.h>
-#include <atomic>
+#ifndef SYNC_H
+#define SYNC_H
+
+#include <stdint.h>
+#include <stdbool.h>
+#include <stddef.h>
 #include "types.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+// Plain C Inter-Core Synchronization API (consumed by Core 1 raw-C core)
+void sync_init(void);
+
+void sync_request_calibrate(void);
+void sync_request_start(void);
+void sync_request_stop(void);
+void sync_request_toggle(void);
+void sync_request_reset_calibration(void);
+
+bool sync_consume_cal_request(void);
+bool sync_consume_start_request(void);
+bool sync_consume_stop_request(void);
+bool sync_consume_toggle_request(void);
+bool sync_consume_reset_cal_request(void);
+
+bool sync_check_config_update(LFRConfig *outConfig);
+void sync_publish_calibration_result(const int minValues[NUM_SENSORS],
+                                     const int maxValues[NUM_SENSORS],
+                                     const bool valid[NUM_SENSORS],
+                                     bool lineHigh,
+                                     bool calibrated);
+void sync_publish_telemetry(const LFRTelemetry *telem);
+void sync_set_status_message(const char *msg);
+
+#ifdef __cplusplus
+}
+
+// C++ API for Core 0 (WebServer / Main / NVS)
 namespace Sync {
+    inline void init() { sync_init(); }
 
-    // Initialize synchronization primitives
-    void init();
+    inline void requestCalibrate() { sync_request_calibrate(); }
+    inline void requestStart() { sync_request_start(); }
+    inline void requestStop() { sync_request_stop(); }
+    inline void requestStartStopToggle() { sync_request_toggle(); }
+    inline void requestResetCalibration() { sync_request_reset_calibration(); }
 
-    // ---------------- Command Dispatch (Core 0 / Buttons -> Core 1) ----------------
-    void requestCalibrate();
-    void requestStart();
-    void requestStop();
-    void requestStartStopToggle();
-    void requestResetCalibration();
+    inline bool consumeCalRequest() { return sync_consume_cal_request(); }
+    inline bool consumeStartRequest() { return sync_consume_start_request(); }
+    inline bool consumeStopRequest() { return sync_consume_stop_request(); }
+    inline bool consumeStartStopToggleRequest() { return sync_consume_toggle_request(); }
+    inline bool consumeResetCalRequest() { return sync_consume_reset_cal_request(); }
 
-    // Check & consume commands (called by Core 1 control loop)
-    bool consumeCalRequest();
-    bool consumeStartRequest();
-    bool consumeStopRequest();
-    bool consumeStartStopToggleRequest();
-    bool consumeResetCalRequest();
-
-    // ---------------- Live Configuration (Core 0 -> Core 1) ----------------
-    // Core 0 updates live tuning parameters (PID / speeds)
     void updateTuningConfig(float kp, float ki, float kd, int lfSpeed, int turnSpeed, int startSpeed);
-    
-    // Core 0 replaces full configuration (e.g. on load defaults or NVS load)
     void setFullConfig(const LFRConfig &cfg);
+    inline bool checkConfigUpdate(LFRConfig &outConfig) { return sync_check_config_update(&outConfig); }
 
-    // Core 1 checks if a new configuration snapshot is pending (lock-free fast path)
-    bool checkConfigUpdate(LFRConfig &outConfig);
+    inline void publishCalibrationResult(const int minValues[NUM_SENSORS],
+                                         const int maxValues[NUM_SENSORS],
+                                         const bool valid[NUM_SENSORS],
+                                         bool lineHigh,
+                                         bool calibrated) {
+        sync_publish_calibration_result(minValues, maxValues, valid, lineHigh, calibrated);
+    }
 
-    // Core 1 publishes completed calibration data back to shared storage
-    void publishCalibrationResult(const int minValues[NUM_SENSORS],
-                                  const int maxValues[NUM_SENSORS],
-                                  const bool valid[NUM_SENSORS],
-                                  bool lineHigh,
-                                  bool calibrated);
-
-    // Retrieve current configuration for Core 0 (e.g. for saving to NVS)
     void getConfigSnapshot(LFRConfig &outConfig);
-
-    // ---------------- Telemetry Snapshot (Core 1 -> Core 0) ----------------
-    void publishTelemetry(const LFRTelemetry &telem);
+    inline void publishTelemetry(const LFRTelemetry &telem) { sync_publish_telemetry(&telem); }
     void getTelemetrySnapshot(LFRTelemetry &dest);
 
-    // ---------------- Thread-Safe Status Message ----------------
-    void setStatusMessage(const char* msg);
+    inline void setStatusMessage(const char* msg) { sync_set_status_message(msg); }
     void getStatusMessage(char* dest, size_t maxLen);
+}
+#endif
 
-} // namespace Sync
+#endif // SYNC_H

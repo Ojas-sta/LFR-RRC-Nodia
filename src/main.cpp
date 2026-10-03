@@ -40,7 +40,7 @@ void setup() {
 
     // 4. Spawn Core 1 Task: Real-Time 1250 Hz LFR Control Loop (Priority 24)
     xTaskCreatePinnedToCore(
-        LFRCore::taskEntry,
+        lfr_task_entry,
         "LFRCore1",
         8192,
         NULL,
