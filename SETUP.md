@@ -20,17 +20,29 @@ pip install -U platformio
 
 Connect your ESP32 via USB and run:
 
+### Windows
+Depending on your terminal:
+- **Command Prompt (`cmd.exe`)**:
+  ```cmd
+  upload.bat
+  ```
+- **PowerShell** *(Default in Windows & VS Code)*:
+  ```powershell
+  .\upload.bat
+  ```
+  *(Or `.\upload.ps1`)*
+- **Git Bash / WSL**:
+  ```bash
+  ./upload.sh
+  ```
+  *(Note: Include the slash `./`, not `.upload.sh`)*
+
 ### macOS / Linux
 ```bash
 ./upload.sh
 ```
 
-### Windows
-```bat
-upload.bat
-```
-
-### Direct PlatformIO Fallback
+### Universal PlatformIO Command (Any OS / Terminal)
 ```bash
 pio run -t upload
 ```

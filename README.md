@@ -55,7 +55,25 @@ pip install -U platformio
 ### 3. Connect ESP32 and Flash
 
 #### Windows
-In the repository root, double-click **`upload.bat`** (or run `upload.bat` in Command Prompt). The script compiles the project, auto-detects the serial COM port, and flashes the firmware.
+Depending on the shell you are using:
+
+- **Command Prompt (`cmd.exe`)**:
+  ```cmd
+  upload.bat
+  ```
+  *(Or simply double-click `upload.bat` in File Explorer)*
+
+- **PowerShell** *(Default terminal in VS Code & Windows 11)*:
+  ```powershell
+  .\upload.bat
+  ```
+  *(Or `.\upload.ps1`)*
+
+- **Git Bash / WSL**:
+  ```bash
+  ./upload.sh
+  ```
+  *(Note: Include the slash `./`, not `.upload.sh`)*
 
 #### Linux / macOS
 Open a terminal in the repository root and run:
@@ -68,7 +86,7 @@ To specify a serial port explicitly (optional):
 ./upload.sh /dev/cu.usbserial-0001
 ```
 
-#### Direct PlatformIO Fallback
+#### Universal PlatformIO Command (Any OS / Any Shell)
 ```bash
 pio run -t upload
 ```
