@@ -7,7 +7,7 @@ A production-grade, competition-tuned line-following robot (LFR) firmware for th
 ## 1. Hardware Architecture
 
 - **Microcontroller**: ESP32 Dual-Core Tensilica Xtensa LX6 (240 MHz)
-- **Sensor Array**: 16-channel analog infrared reflectance array multiplexed via 16-channel analog multiplexer (CD74HC4067)
+- **Sensor Array**: **RoboJunkies 14-channel analog infrared reflectance array** multiplexed via CD74HC4067 multiplexer
 - **Motor Driver**: TB6612FNG Dual H-Bridge (20 kHz ultrasonic PWM)
 - **Actuators**: 2× Micro Metal Gear DC N20 Motors
 - **Indicators & Controls**:
@@ -54,7 +54,7 @@ The firmware enforces strict hardware and task isolation between FreeRTOS cores 
   +-------------------------------------+ | +-------------------------------------+
   | - SoftAP: "LineFollower_AP"         | | | - 800 µs (~1250 Hz) Deterministic   |
   | - WebServer (Port 80)               | | |   Control Loop                      |
-  | - HTTP Handlers (/, /status, /pid,  | | | - 16-ch MUX Acquisition (ADC1)     |
+  | - HTTP Handlers (/, /status, /pid,  | | | - 14-ch MUX Acquisition (ADC1)     |
   |   /start, /cal, /save, /defaults)   | | | - Error & PID Calculation           |
   | - Live Tuning RAM updates           | | | - Speed Ramping & Sharp Turns       |
   | - Persistent NVS (Preferences)      | | | - Lost-Line Recovery                |
@@ -139,7 +139,7 @@ Connect any smartphone or laptop to `LineFollower_AP` and open `http://192.168.4
 
 The dashboard displays:
 - **Robot State Badge**: `IDLE`, `CALIBRATING`, `READY`, or `RUNNING`
-- **Live Sensor Bar Array**: 16 real-time bars showing reflectance values (0..1000) and detection state
+- **Live Sensor Bar Array**: 14 real-time bars showing reflectance values (0..1000) and detection state
 - **Status Messages**: Feedback from calibration, boot, and motor commands
 - **Live Sliders**: `Kp`, `Ki`, `Kd`, `Speed`, `Turn`, `Start`
 - **Primary Buttons**: **Calibrate**, **Start / Stop**
@@ -157,7 +157,7 @@ Before running, the robot must be calibrated:
    - Measures maximum, minimum, and noise floor per sensor channel.
    - Filters single-sample spikes using a 3-sample median filter (`med3`).
    - Automatically detects whether the track has a black line on white surface or white line on black surface.
-4. If at least 8 sensors register a minimum contrast span (`MIN_RANGE = 150`), the robot enters **`READY`** state.
+4. If at least 7 sensors register a minimum contrast span (`MIN_RANGE = 150`), the robot enters **`READY`** state.
 5. If calibration fails, the robot enters **`IDLE`** with an explanatory message.
 
 ---

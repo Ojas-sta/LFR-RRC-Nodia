@@ -75,7 +75,7 @@ button:disabled{opacity:0.35;cursor:not-allowed}
 
 <script>
 const $=id=>document.getElementById(id);
-let bh='',nh='';for(let i=0;i<16;i++){bh+='<div class="bar" id="b'+i+'"></div>';nh+='<div class="n">'+i+'</div>'}
+let bh='',nh='';for(let i=0;i<14;i++){bh+='<div class="bar" id="b'+i+'"></div>';nh+='<div class="n">'+i+'</div>'}
 $('bars').innerHTML=bh;$('nums').innerHTML=nh;
 
 function act(c){
