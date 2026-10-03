@@ -1,4 +1,4 @@
-# LFR-RRC-Nodia
+# LFR-RRC-Noida
 
 A high-speed, dual-core line-following robot (LFR) firmware for the ESP32 microcontroller, engineered for competition racing with deterministic 1250 Hz control execution and wireless telemetry and tuning.
 
