@@ -1,0 +1,11 @@
+.pio
+.vscode
+.idea
+*.bin
+*.elf
+*.hex
+*.o
+*.d
+*.tar.gz
+*.zip
+.DS_Store
