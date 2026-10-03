@@ -6,7 +6,7 @@
 // HARDWARE PIN DEFINITIONS (ESP32 v8 Pinout)
 // ============================================================================
 
-// 14-Channel RoboJunkies Sensor Array multiplexed via CD74HC4067
+// 16-Channel Analog Multiplexer (CD74HC4067)
 #define MUX_S0          32
 #define MUX_S1          33
 #define MUX_S2          25
@@ -32,18 +32,17 @@
 #define LED_PIN          2    // Status LED (Active HIGH)
 
 // ============================================================================
-// SENSOR ARRAY & LINE-FOLLOWING CONSTANTS (RoboJunkies 14-Channel)
+// SENSOR ARRAY & LINE-FOLLOWING CONSTANTS (16-Channel Nano LF-2 Reference)
 // ============================================================================
-constexpr int   NUM_SENSORS        = 14;    // RoboJunkies 14-channel sensor array
+constexpr int   NUM_SENSORS        = 16;    // 16-channel sensor array
 constexpr int   SEEN_THRESHOLD     = 500;   // sensorValue > 500 = on line (range 0..1000)
 constexpr int   LOST_FWD           = 255;   // Line-lost recovery fast wheel speed
 constexpr int   LOST_REV           = -100;  // Line-lost recovery reverse wheel speed
 constexpr int   PWM_MIN            = -100;  // Clamped motor PWM min
 constexpr int   PWM_MAX            = 255;   // Clamped motor PWM max
 
-// Sensor geometric weighting for 14 channels (Symmetric around center pair 6, 7):
-// Left: 6, 5, 4, 3, 2, 1 | Center: 0, 0 | Right: -1, -2, -3, -4, -5, -6
-constexpr int   SENSOR_WEIGHTS[14] = { 6, 5, 4, 3, 2, 1, 0, 0, -1, -2, -3, -4, -5, -6 };
+// Sensor geometric weighting (exact 16-channel array from reference code):
+constexpr int   SENSOR_WEIGHTS[16] = { 7, 6, 5, 4, 3, 2, 1, 0, 0, -1, -2, -3, -4, -5, -6, -7 };
 
 // Timing & ADC settings
 constexpr uint32_t LOOP_PERIOD_US  = 800;   // ~1250 Hz control loop frequency (reference Nano LF-2)
@@ -58,7 +57,7 @@ constexpr bool     IS_BLACK_LINE   = true;  // Fallback if AUTO_POLARITY is fals
 constexpr int      CAL_SPEED       = 90;    // Calibration spin PWM
 constexpr uint32_t CAL_TIME_MS     = 5000;  // Total calibration spin time (2.5s each dir)
 constexpr int      MIN_RANGE       = 150;   // Minimum (max-min) ADC span to consider sensor valid
-constexpr int      MIN_VALID       = 7;     // Minimum working sensors for 14-ch array (>= half)
+constexpr int      MIN_VALID       = 8;     // Need at least 8 working sensors (out of 16)
 
 // ============================================================================
 // DEFAULT TUNING PARAMETERS (Exact tuned defaults from reference source)
@@ -93,4 +92,4 @@ constexpr int      AP_MAX_CONN         = 3;
 // ============================================================================
 inline const char* NVS_NAMESPACE       = "lfr_cfg";
 constexpr uint32_t CONFIG_MAGIC        = 0x4C465231; // ASCII "LFR1"
-constexpr uint16_t CONFIG_VERSION      = 2;          // Version bump for 14-channel layout
+constexpr uint16_t CONFIG_VERSION      = 1;          // 16-channel layout version

@@ -21,7 +21,7 @@ namespace LFRCore {
     static double     error = 0.0;
     static int        lsp = 0, rsp = 0;
     static int        currentSpeed = DEFAULT_START_SPEED;
-    static int        lastTurnDir = 0; // 1 = left side (0/1), -1 = right side (12/13)
+    static int        lastTurnDir = 0; // 1 = line last seen on sensor 0 side, -1 = sensor 15 side
     static int        activeSensors = 0;
     static int        onLine = 1;
 
@@ -252,8 +252,8 @@ namespace LFRCore {
             activeConfig.calibrated = false;
             currentState = RobotState::IDLE;
             snprintf(m, sizeof(m),
-                     "Calibration FAILED: only %d/%d sensors saw the line (best range %d). "
-                     "Put the line under the array; check the robot actually spins.", ok, NUM_SENSORS, best);
+                     "Calibration FAILED: only %d/16 sensors saw the line (best range %d). "
+                     "Put the line under the array; check the robot actually spins.", ok, best);
             Sync::setStatusMessage(m);
             Sync::publishCalibrationResult(activeConfig.minValues, activeConfig.maxValues, activeConfig.valid, activeConfig.lineHigh, false);
             return;
@@ -262,8 +262,8 @@ namespace LFRCore {
         activeConfig.calibrated = true;
         currentState = RobotState::READY;
         currentCalPct = 100;
-        snprintf(m, sizeof(m), "Calibration OK: %d/%d sensors, line reads %s. Place robot on line and press Start.%s",
-                 ok, NUM_SENSORS, activeConfig.lineHigh ? "HIGH" : "LOW",
+        snprintf(m, sizeof(m), "Calibration OK: %d/16 sensors, line reads %s. Place robot on the line and press Start.%s",
+                 ok, activeConfig.lineHigh ? "HIGH" : "LOW",
                  clip > 4 ? " WARNING: sensors clipping at ADC max (SIG > 3.1 V?)" : "");
         Sync::setStatusMessage(m);
         Sync::publishCalibrationResult(activeConfig.minValues, activeConfig.maxValues, activeConfig.valid, activeConfig.lineHigh, true);
@@ -307,18 +307,18 @@ namespace LFRCore {
 
         readLine();
 
-        // Remember which side the line was last detected on
+        // remember which side the line was last seen on
         if (sensorArray[0] || sensorArray[1]) {
             lastTurnDir = 1;
-        } else if (sensorArray[12] || sensorArray[13]) {
+        } else if (sensorArray[14] || sensorArray[15]) {
             lastTurnDir = -1;
         }
 
-        // Outer sensors see the line = sharp turn, so reduce speed
-        if (sensorArray[0] || sensorArray[1] || sensorArray[12] || sensorArray[13]) {
+        // outer sensors see the line = sharp turn, so slow down
+        if (sensorArray[0] || sensorArray[1] || sensorArray[14] || sensorArray[15]) {
             currentSpeed = activeConfig.turnSpeed;
         } else if (currentSpeed < activeConfig.lfSpeed) {
-            currentSpeed++; // Ramp back up to full line-follow speed
+            currentSpeed++; // ramp back up after the turn
         }
 
         if (onLine == 1) {

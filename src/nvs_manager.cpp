@@ -77,8 +77,8 @@ bool NVSManager::loadConfig(LFRConfig &cfg) {
     }
 
     cfg.calibrated = true;
-    Serial.printf("[NVS] Successfully loaded configuration & calibration (%d/%d valid sensors, line reads %s).\n",
-                  okCount, NUM_SENSORS, cfg.lineHigh ? "HIGH" : "LOW");
+    Serial.printf("[NVS] Successfully loaded configuration & calibration (%d/16 valid sensors, line reads %s).\n",
+                  okCount, cfg.lineHigh ? "HIGH" : "LOW");
     prefs.end();
     return true;
 }
